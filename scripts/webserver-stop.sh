@@ -3,4 +3,3 @@
 
 service httpd stop
 
-rm /var/www/html/index.html
