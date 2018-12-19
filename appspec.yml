@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 
 files:
-  - source: files/newpage.html
+  - source: files/index.html
     destination: /var/www/html
 
 permissions:
