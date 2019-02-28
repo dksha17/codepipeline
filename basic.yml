@@ -1,0 +1,47 @@
+Parameters:
+  AnsibleRepository:
+    Default: https://github.com/dksha17/ansible
+    Description: The git repository of Ansible playbooks
+    Type: String
+  AnsiblerCheckout:
+    Default: 9b3676bb9eb92e56c96375362d98fd43e637a58d
+    Description: The branch/tag/commit to checkout
+    Type: String
+  AnsiblePlaybook:
+    Default: playbooks/install-service.yml
+    Description: The Ansible playbook to use
+    Type: String
+Resources:
+  Ec2Instance:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: t2.micro
+        ImageId: ami-035be7bafff33b6b6
+        KeyName: "MyEC2Web"
+        SecurityGroups: 
+        - !Ref MySecurityGroup
+        UserData:
+          Fn::Base64:
+            Fn::Join:
+              - ''
+              - "#!/bin/bash\n"
+              - 'yum update -y'
+              - 'yum install epel-release -y'
+              sudo amazon-linux-extras install epel
+              - 'yum install -y ansible git'
+              - 'echo "localhost ansible_connection=local" > /etc/ansible/hosts'
+              - 'ansible-pull -U '
+              - Ref: AnsibleRepository
+              - " -C "
+              - Ref: AnsibleCheckout
+              - " "
+              - Ref: AnsiblePlaybook   
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0 

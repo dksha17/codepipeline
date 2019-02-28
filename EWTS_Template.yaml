@@ -1,0 +1,22 @@
+Resources:
+  Ec2Instance:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: t2.micro
+        ImageId: ami-0ac1f16f
+        SubnetId: "subnet-af5f14c6"
+        SecurityGroup: "sg-e7f9348f"
+        BlockDeviceMappings:
+          - DeviceName: /dev/sdb
+        Ebs:
+          VolumeType: gp2
+          DeleteOnTermination: true
+          VolumeSize: 20
+        Tags:
+          - Key: COSTCENTER
+            Value: 35031
+          - Key: GROUP
+            Value: ewts
+          - Key: APPACCESS
+            Value: middleware  
+        

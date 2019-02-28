@@ -1,0 +1,17 @@
+Parameters:
+  KeyName:
+    Description: Allow you to access EC2 instance created.
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: The name of an existing EC2 Keypair
+Resources:
+   Ec2Instance:
+      Type: AWS::EC2::Instance
+      Properties:
+        InstanceType: t2.micro
+        ImageId: ami-009d6802948d06e52
+        KeyName: !Ref KeyName  
+        Tags:
+          - Key: Name
+            Value: Middleware
+
+            

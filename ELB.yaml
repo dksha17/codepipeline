@@ -1,0 +1,50 @@
+Resources:
+  ServiceELB:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      Listeners:
+      - LoadBalancerPort: '80'
+        InstancePort: '80'
+        Protocol: HTTP
+      LoadBalancerName: "myelb"
+      AvailabilityZones: ["us-east-1a"]
+      SecurityGroups:
+      - !Ref MySecurityGroup
+  ServiceAutoScale:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: 
+        Ref: "ServiceLaunchConfiguration"
+      AutoScalingGroupName: Scaleweb
+      DesiredCapacity: 2
+      MinSize: 2
+      MaxSize: 3
+      AvailabilityZones: ["us-east-1a"]
+      LoadBalancerNames: 
+        - Ref: "ServiceELB"
+  ServiceLaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-035be7bafff33b6b6
+      InstanceType: t2.micro
+      LaunchConfigurationName: mynew
+      KeyName: "MyEC2Web"
+      SecurityGroups: 
+      - !Ref MySecurityGroup
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      VpcId: vpc-51b96d2b
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0  
+
+  

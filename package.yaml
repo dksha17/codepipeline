@@ -1,0 +1,42 @@
+Resources:
+  Scale_Auto:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+  Ec2Instance:
+      Type: AWS::EC2::Instance
+      Metadata:
+        AWS::CloudFormation::Init:
+          config:
+             packages:
+               yum:
+                 httpd: []
+             users:
+               jboss:
+                 groups:
+                  - "jboss"
+                 uid: "501"
+                 homeDir: "/home/jboss"
+      Properties:
+        InstanceType: t2.micro
+        ImageId: ami-009d6802948d06e52
+        KeyName: "MyEC2Web"
+        SecurityGroups: 
+        - !Ref MySecurityGroup
+        UserData:
+          'Fn::Base64': 
+            !Sub |
+              #!/bin/bash -xe            
+              # Ensure AWS CFN Bootstrap is the latest
+              yum install -y aws-cfn-bootstrap
+              # Install the files and packages from the metadata
+              /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource Ec2Instance  --region ${AWS::Region}      
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0 
